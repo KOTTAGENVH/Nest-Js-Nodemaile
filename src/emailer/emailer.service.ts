@@ -1,26 +1,38 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { CreateEmailerDto } from './dto/create-emailer.dto';
-import { UpdateEmailerDto } from './dto/update-emailer.dto';
+import * as nodemailer from 'nodemailer';
+
 
 @Injectable()
 export class EmailerService {
-  create(createEmailerDto: CreateEmailerDto) {
-    return 'This action adds a new emailer';
+  private transporter: nodemailer.Transporter;
+
+  constructor() {
+    // Create a transporter object using SMTP
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: '', // Replace with your email address
+        pass: '', // Replace with your email password  //Generate a app password from your google account
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all emailer`;
-  }
 
-  findOne(id: number) {
-    return `This action returns a #${id} emailer`;
-  }
+  //sendMail function when employee is created
+  async sendMail(to: string, subject: string, body: string): Promise<void> {
+    try {
+      // Send mail with defined transport object
+      await this.transporter.sendMail({
+        from: '', // Replace with your email address
+        to,
+        subject,
+        text: body,
+      });
 
-  update(id: number, updateEmailerDto: UpdateEmailerDto) {
-    return `This action updates a #${id} emailer`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} emailer`;
+      console.log('Email sent successfully');
+    } catch (error) {
+      console.error('Error sending email', error);
+    }
   }
 }
